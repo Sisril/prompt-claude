@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Before Prompting — Setup Workflow</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Serif:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0e0e0e;
+  --surface:   #161616;
+  --surface2:  #1e1e1e;
+  --border:    #2a2a2a;
+  --border2:   #383838;
+  --text:      #e8e4dc;
+  --text-mid:  #9a9690;
+  --text-dim:  #5a5650;
+  --amber:     #e8a020;
+  --amber-dim: #3a2800;
+  --amber-mid: #7a5010;
+  --green:     #3cb870;
+  --green-dim: #0a2818;
+  --green-mid: #1a5a38;
+  --blue:      #5090e0;
+  --blue-dim:  #0a1828;
+  --blue-mid:  #1a3870;
+  --red:       #e05050;
+  --red-dim:   #280a0a;
+  --mono:      'IBM Plex Mono', monospace;
+  --sans:      'IBM Plex Sans', sans-serif;
+  --serif:     'IBM Plex Serif', serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+.header {
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+}
+
+.header-top {
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 5px;
+}
+
+.header-title {
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -.2px;
+}
+
+.header-sub {
+  font-size: 11.5px;
+  color: var(--text-mid);
+  margin-top: 3px;
+  font-weight: 300;
+}
+
+/* ── TAB NAV ── */
+.tab-nav {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+
+.tab {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  padding: 10px 18px;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .12s;
+  letter-spacing: .04em;
+  position: relative;
+}
+
+.tab:hover { color: var(--text-mid); background: var(--surface); }
+
+.tab.active {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.tab.t0.active::after { background: var(--amber); }
+.tab.t1.active::after { background: var(--blue); }
+.tab.t2.active::after { background: var(--green); }
+.tab.t3.active::after { background: var(--red); }
+.tab.t4.active::after { background: var(--amber); }
+
+/* ── CONTENT ── */
+.content {
+  padding: 24px;
+  max-width: 800px;
+}
+
+.panel { display: none; }
+.panel.active {
+  display: block;
+  animation: fadein .18s ease;
+}
+
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SECTION HEADING ── */
+.sec-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.sec-title {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -.3px;
+  line-height: 1.2;
+}
+
+.sec-desc {
+  font-size: 13px;
+  color: var(--text-mid);
+  font-weight: 300;
+  margin-bottom: 22px;
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+/* ── DIVIDER ── */
+.div { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  transition: border-color .12s;
+}
+.card:hover { border-color: var(--border2); }
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.badge {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  padding: 2px 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.badge-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-mid); }
+.badge-green { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-mid); }
+.badge-blue  { background: var(--blue-dim);  color: var(--blue);  border: 1px solid var(--blue-mid); }
+.badge-red   { background: var(--red-dim);   color: var(--red);   border: 1px solid #582020; }
+.badge-dim   { background: var(--surface2);  color: var(--text-mid); border: 1px solid var(--border2); }
+
+.card-title { font-weight: 500; font-size: 13.5px; color: var(--text); }
+.card-text  { font-size: 12.5px; color: var(--text-mid); font-weight: 300; line-height: 1.6; }
+.card-text strong { color: var(--text); font-weight: 500; }
+
+/* ── STEP ROWS ── */
+.steps { display: flex; flex-direction: column; gap: 0; }
+
+.step-row {
+  display: flex;
+  gap: 0;
+  position: relative;
+}
+
+.step-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text-mid);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 1;
+  transition: all .12s;
+}
+
+.step-row:hover .step-dot { border-color: var(--amber); color: var(--amber); }
+
+.step-vline {
+  width: 1px;
+  flex: 1;
+  min-height: 16px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.step-body {
+  flex: 1;
+  padding: 0 0 20px 16px;
+}
+
+.step-title { font-weight: 500; font-size: 13.5px; margin-bottom: 5px; color: var(--text); padding-top: 4px; }
+.step-text  { font-size: 12.5px; color: var(--text-mid); font-weight: 300; line-height: 1.6; }
+.step-text strong { color: var(--text); font-weight: 500; }
+
+/* ── CALLOUT ── */
+.callout {
+  border-left: 2px solid;
+  padding: 10px 14px;
+  border-radius: 0 3px 3px 0;
+  margin: 12px 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.callout-amber { border-color: var(--amber); background: var(--amber-dim); color: #c89040; }
+.callout-green { border-color: var(--green); background: var(--green-dim); color: #60b888; }
+.callout-blue  { border-color: var(--blue);  background: var(--blue-dim);  color: #7aaae8; }
+.callout-red   { border-color: var(--red);   background: var(--red-dim);   color: #e07878; }
+.callout strong { color: inherit; font-weight: 600; }
+
+/* ── CHECKLIST ── */
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.checklist li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 12.5px;
+  color: var(--text-mid);
+  font-weight: 300;
+}
+.check-icon {
+  font-family: var(--mono);
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--text-dim);
+}
+
+/* ── COMPARISON TABLE ── */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 14px 0;
+}
+.compare-col { padding: 14px 16px; }
+.compare-col:first-child { border-right: 1px solid var(--border); background: var(--red-dim); }
+.compare-col:last-child  { background: var(--green-dim); }
+.compare-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.compare-col:first-child .compare-label { color: var(--red); }
+.compare-col:last-child  .compare-label { color: var(--green); }
+.compare-item {
+  font-size: 12px;
+  color: var(--text-mid);
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  font-weight: 300;
+}
+.compare-item:last-child { border-bottom: none; }
+
+/* ── FEATURE GRID ── */
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.feat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 16px;
+  cursor: default;
+  transition: border-color .12s;
+}
+.feat-card:hover { border-color: var(--border2); }
+
+.feat-icon {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+
+.feat-name { font-weight: 500; font-size: 13px; color: var(--text); margin-bottom: 4px; }
+.feat-desc { font-size: 11.5px; color: var(--text-mid); font-weight: 300; line-height: 1.5; }
+
+/* ── TERMINAL BLOCK ── */
+.terminal {
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.terminal-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.terminal-dots { display: flex; gap: 5px; }
+.terminal-dots span {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border2);
+}
+
+.terminal-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: .08em;
+  flex: 1;
+  text-align: center;
+}
+
+.copy-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 2px 8px;
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  letter-spacing: .06em;
+  transition: all .12s;
+}
+.copy-btn:hover { border-color: var(--amber); color: var(--amber); }
+.copy-btn.ok { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+
+.terminal-body {
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.75;
+  color: #b0a898;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.terminal-body .ph  { color: var(--amber); }
+.terminal-body .kw  { color: var(--blue); }
+.terminal-body .ok  { color: var(--green); }
+.terminal-body .cm  { color: var(--text-dim); font-style: italic; }
+.terminal-body .err { color: var(--red); }
+
+.terminal-body::-webkit-scrollbar { width: 3px; }
+.terminal-body::-webkit-scrollbar-track { background: transparent; }
+.terminal-body::-webkit-scrollbar-thumb { background: var(--border2); }
+
+/* ── TAG ROW ── */
+.tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  background: var(--surface2);
+}
+.tag-a { border-color: var(--amber-mid); color: var(--amber); background: var(--amber-dim); }
+.tag-g { border-color: var(--green-mid); color: var(--green); background: var(--green-dim); }
+.tag-b { border-color: var(--blue-mid);  color: var(--blue);  background: var(--blue-dim); }
+
+/* ── CHECKLIST SETUP ── */
+.setup-list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.setup-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+}
+
+.setup-num {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: 20px;
+}
+
+.setup-text { color: var(--text-mid); font-weight: 300; line-height: 1.5; }
+.setup-text strong { color: var(--text); font-weight: 500; }
+
+/* ── STATUS ROW ── */
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  margin: 6px 0;
+  font-size: 12.5px;
+}
+
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-off { background: var(--red); box-shadow: 0 0 4px var(--red); }
+.dot-on  { background: var(--green); box-shadow: 0 0 4px var(--green); }
+.dot-mid { background: var(--amber); box-shadow: 0 0 4px var(--amber); }
+
+.status-label { font-family: var(--mono); font-size: 10px; color: var(--text-mid); flex: 1; }
+.status-val   { font-size: 11.5px; color: var(--text-mid); font-weight: 300; }
+
+/* ── QUOTE ── */
+.pull-quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-mid);
+  border-left: 2px solid var(--border2);
+  padding: 12px 18px;
+  margin: 18px 0;
+  line-height: 1.6;
+}
+.pull-quote span { color: var(--amber); font-style: normal; font-family: var(--mono); font-size: 12px; }
+
+/* ── NAV BUTTONS ── */
+.nav-row { display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap; }
+
+.btn {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  padding: 8px 16px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all .12s;
+  letter-spacing: .04em;
+}
+.btn-primary { background: var(--amber); color: var(--bg); border: none; font-weight: 600; }
+.btn-primary:hover { opacity: .85; }
+.btn-ghost { background: transparent; color: var(--text-mid); border: 1px solid var(--border2); }
+.btn-ghost:hover { border-color: var(--text-dim); color: var(--text); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 560px) {
+  .content { padding: 16px; }
+  .header-top { padding: 12px 16px; }
+  .compare { grid-template-columns: 1fr; }
+  .compare-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  .feat-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="eyebrow">Setup Workflow — Dosen &amp; Researcher</div>
+    <div class="header-title">Before You Prompt</div>
+    <div class="header-sub">3 hal yang harus diaktifkan sebelum mengetik prompt apapun</div>
+  </div>
+  <div class="tab-nav">
+    <button class="tab t0 active" onclick="show('p0',this)">00 — Masalah</button>
+    <button class="tab t1" onclick="show('p1',this)">01 — Projects</button>
+    <button class="tab t2" onclick="show('p2',this)">02 — Thinking</button>
+    <button class="tab t3" onclick="show('p3',this)">03 — Search</button>
+    <button class="tab t4" onclick="show('p4',this)">04 — Checklist</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ══════════════ PANEL 0 ══ -->
+<div class="panel active" id="panel-p0">
+  <div class="sec-label">Gambaran besar</div>
+  <div class="sec-title">Promptmu gagal sebelum kamu mengetiknya.</div>
+  <div class="sec-desc">Bukan AI-nya yang bermasalah. Cara kamu menyiapkan kondisi sebelum prompt yang perlu diperbaiki.</div>
+
+  <div class="pull-quote">
+    "Jika kamu merekrut konsultan brilian tapi tidak memberinya konteks apapun, tidak ada dokumen, tidak ada contoh sukses — lalu menuntut jawaban instan — apakah kamu akan menyalahkan konsultannya?"
+    <br><span>— Ruben Hassid</span>
+  </div>
+
+  <div class="sec-label" style="margin-bottom:8px">Cara kebanyakan orang menggunakan AI</div>
+
+  <div class="compare">
+    <div class="compare-col">
+      <div class="compare-label">❌ Yang biasa dilakukan</div>
+      <div class="compare-item">Buka chat baru (bukan Project)</div>
+      <div class="compare-item">Ketik prompt cepat tanpa persiapan</div>
+      <div class="compare-item">Tidak aktifkan Thinking</div>
+      <div class="compare-item">Tidak aktifkan Search</div>
+      <div class="compare-item">Copy-paste "prompt ajaib" dari internet</div>
+      <div class="compare-item">Dapat hasil biasa → salahkan AI</div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-label">✓ Yang seharusnya dilakukan</div>
+      <div class="compare-item">Buka Project yang sudah disiapkan</div>
+      <div class="compare-item">AI sudah tahu siapa kamu &amp; standarmu</div>
+      <div class="compare-item">Aktifkan Extended Thinking</div>
+      <div class="compare-item">Aktifkan Search (jika butuh akurasi)</div>
+      <div class="compare-item">Baru ketik prompt — singkat tapi kontekstual</div>
+      <div class="compare-item">Dapat hasil dalam (langsung relevan)</div>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-bottom:8px;margin-top:18px">Akibat jika tidak disiapkan</div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-red">PROBLEM 1</span>
+      <div class="card-title">AI tidak ingat siapa kamu</div>
+    </div>
+    <div class="card-text">Setiap sesi baru, kamu harus menjelaskan ulang: nama, bidang ilmu, gaya menulis, audiens, standar kualitas. Ini buang waktu dan token — dan AI tetap tidak punya konteks yang cukup dalam.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-red">PROBLEM 2</span>
+      <div class="card-title">AI tidak mengikuti instruksi kompleks</div>
+    </div>
+    <div class="card-text">Tanpa Thinking, AI menjawab seperti orang yang diwawancara — langsung menjawab apapun agar tidak terlihat tidak tahu. Hasilnya: jawaban dangkal yang terdengar benar tapi tidak substantif.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-red">PROBLEM 3</span>
+      <div class="card-title">AI mengarang fakta (halusinasi)</div>
+    </div>
+    <div class="card-text">Tanpa Search, AI mengisi celah pengetahuannya dengan "apa yang terdengar seperti jawaban yang benar" — bukan fakta yang bisa diverifikasi. Berbahaya untuk tulisan ilmiah dan data penelitian.</div>
+  </div>
+
+  <div class="callout callout-amber" style="margin-top:16px">
+    <strong>Solusi:</strong> Tiga hal yang harus diaktifkan sebelum prompt apapun — Projects, Extended Thinking, dan Search. Pelajari masing-masing di tab berikutnya.
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-primary" onclick="show('p1', document.querySelectorAll('.tab')[1])">Mulai dari Projects →</button>
+  </div>
+</div>
+
+<!-- ══════════════ PANEL 1 ══ -->
+<div class="panel" id="panel-p1">
+  <div class="sec-label">Langkah 01 dari 03</div>
+  <div class="sec-title">Projects</div>
+  <div class="sec-desc">Berhenti memperkenalkan dirimu setiap sesi. Buat Project sekali — AI ingat selamanya.</div>
+
+  <div class="callout callout-blue">
+    <strong>Analogi:</strong> Bayangkan kamu punya asisten peneliti baru yang setiap Senin pagi kamu harus perkenalkan dirimu lagi dari awal. Itu yang kamu lakukan kepada AI setiap membuka chat baru.
+  </div>
+
+  <div class="div"></div>
+
+  <div class="sec-label" style="margin-bottom:10px">Apa itu Projects dan apa kelebihannya</div>
+
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon" style="color:var(--blue)">[ INSTRUKSI ]</div>
+      <div class="feat-name">Custom Instructions</div>
+      <div class="feat-desc">Tulis sekali — berlaku untuk setiap percakapan di dalam Project. Tidak perlu jelaskan ulang gaya, standar, atau konteks.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="color:var(--green)">[ FILES ]</div>
+      <div class="feat-name">File Referensi</div>
+      <div class="feat-desc">Upload voice profile, referensi metodologi, template jurnal. AI bisa merujuknya kapanpun kamu prompt.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="color:var(--amber)">[ KONTEKS ]</div>
+      <div class="feat-name">Konteks Kumulatif</div>
+      <div class="feat-desc">Setiap percakapan membangun konteks yang semakin kaya. AI semakin paham cara kerjamu dari waktu ke waktu.</div>
+    </div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="sec-label" style="margin-bottom:10px">Cara setup Project untuk dosen — langkah per langkah</div>
+
+  <div class="steps">
+    <div class="step-row">
+      <div class="step-aside">
+        <div class="step-dot">1</div>
+        <div class="step-vline"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Buat Project baru di Claude</div>
+        <div class="step-text">Di Claude.ai atau Claude Desktop, klik <strong>+ New Project</strong>. Beri nama yang spesifik, misalnya: <em>"Penelitian — Jurnal &amp; Hibah"</em> atau <em>"Pengajaran — Materi Kuliah"</em>. Pisahkan Project berdasarkan jenis aktivitas, bukan satu Project untuk semua.</div>
+        <div class="tag-row">
+          <span class="tag tag-b">📁 Penelitian</span>
+          <span class="tag tag-b">📁 Pengajaran</span>
+          <span class="tag tag-b">📁 Administrasi</span>
+        </div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-aside">
+        <div class="step-dot">2</div>
+        <div class="step-vline"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Tulis Custom Instructions</div>
+        <div class="step-text">Ini penjelasan satu kali tentang siapa kamu dan bagaimana AI harus berinteraksi denganmu. Contoh untuk Project Penelitian:</div>
+        <div class="terminal" style="margin-top:10px">
+          <div class="terminal-bar">
+            <div class="terminal-dots"><span></span><span></span><span></span></div>
+            <div class="terminal-label">custom-instructions.txt</div>
+            <button class="copy-btn" onclick="copyEl('ci1', this)">COPY</button>
+          </div>
+          <div class="terminal-body" id="ci1">Saya adalah dosen dan peneliti di bidang <span class="ph">[bidang ilmu kamu]</span>.
+
+<span class="kw">Gaya komunikasi:</span>
+- Gunakan bahasa akademik yang presisi tapi tidak kaku
+- Kalimat tidak lebih dari 3 baris per paragraf
+- Hindari pembuka klise seperti "Pada era globalisasi..."
+- Tidak menggunakan kata: "holistik", "komprehensif", "robust"
+
+<span class="kw">Standar output:</span>
+- Sitasi selalu dalam format APA 7th edition
+- Setiap klaim ilmiah harus didukung referensi
+- Abstrak: 150-250 kata
+- Selalu tawari untuk lanjut ke bagian berikutnya
+
+<span class="kw">File yang tersedia:</span>
+- voice-profile.md — cara berpikir dan menulisku
+- metodologi.md — pendekatan penelitian yang saya gunakan</div>
+        </div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-aside">
+        <div class="step-dot">3</div>
+        <div class="step-vline"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Upload file — kurang lebih, bukan banyak</div>
+        <div class="step-text">Jangan upload semua yang kamu punya. AI akan kesulitan menentukan mana yang paling relevan. Upload <strong>hanya yang terbaik dan paling relevan</strong> untuk Project itu. Rekomendasi untuk Project Penelitian:</div>
+        <div class="setup-list" style="margin-top:10px">
+          <div class="setup-item">
+            <div class="setup-num">01</div>
+            <div class="setup-text"><strong>voice-profile.md</strong> — DNA cara berpikirmu (dari proses wawancara di workflow sebelumnya)</div>
+          </div>
+          <div class="setup-item">
+            <div class="setup-num">02</div>
+            <div class="setup-text"><strong>metodologi.md</strong> — pendekatan penelitian yang kamu gunakan (kuantitatif/kualitatif/mixed)</div>
+          </div>
+          <div class="setup-item">
+            <div class="setup-num">03</div>
+            <div class="setup-text"><strong>template-jurnal.md</strong> — struktur artikel jurnal target, panduan gaya selingkung, format sitasi</div>
+          </div>
+        </div>
+        <div class="callout callout-amber">
+          <strong>Tips:</strong> Buat Google Doc berisi informasi terbaik → download sebagai Markdown (.md) → upload ke Project. Jangan upload file Word atau PDF mentah yang panjang.
+        </div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-aside">
+        <div class="step-dot">4</div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Selalu buat chat baru di dalam Project</div>
+        <div class="step-text">Jangan buka Claude dari halaman utama. Selalu masuk ke Project dulu → baru buat chat baru. Ini memastikan semua instruksi dan file sudah aktif sebelum kamu mengetik apapun.</div>
+        <div class="callout callout-blue" style="margin-top:10px">
+          <strong>Tersedia di:</strong> Claude (Projects), ChatGPT (Projects), Grok (Projects). Setup-nya sama di ketiga platform — instruksi dan file yang identik bisa digunakan di semua.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="show('p0', document.querySelectorAll('.tab')[0])">← Kembali</button>
+    <button class="btn btn-primary" onclick="show('p2', document.querySelectorAll('.tab')[2])">02 — Extended Thinking →</button>
+  </div>
+</div>
+
+<!-- ══════════════ PANEL 2 ══ -->
+<div class="panel" id="panel-p2">
+  <div class="sec-label">Langkah 02 dari 03</div>
+  <div class="sec-title">Extended Thinking</div>
+  <div class="sec-desc">Bukan "mode lebih pintar" — melainkan izin bagi AI untuk benar-benar berpikir sebelum menjawab.</div>
+
+  <div class="compare">
+    <div class="compare-col">
+      <div class="compare-label">❌ Tanpa Thinking</div>
+      <div class="compare-item">Seperti orang yang diwawancara kerja</div>
+      <div class="compare-item">Harus menjawab sekarang, apapun itu</div>
+      <div class="compare-item">Mencocokkan pola yang terdengar benar</div>
+      <div class="compare-item">Berpikir dan berbicara bersamaan</div>
+      <div class="compare-item">Hasil: jawaban dangkal dan generik</div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-label">✓ Dengan Thinking</div>
+      <div class="compare-item">Diizinkan tidak yakin dan mempertimbangkan</div>
+      <div class="compare-item">Bisa mundur jika argumen tidak cocok</div>
+      <div class="compare-item">Membangun argumen nyata, bukan hafalan</div>
+      <div class="compare-item">Berpikir dulu, baru berbicara</div>
+      <div class="compare-item">Hasil: insight yang dalam dan substantif</div>
+    </div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="sec-label" style="margin-bottom:10px">Kapan harus aktifkan Thinking — panduan untuk dosen</div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-green">AKTIFKAN</span>
+      <div class="card-title">Tugas yang butuh penalaran mendalam</div>
+    </div>
+    <div class="card-text">
+      <ul class="checklist" style="margin:6px 0 0">
+        <li><span class="check-icon">▸</span><span>Menganalisis data penelitian dan mengidentifikasi pola</span></li>
+        <li><span class="check-icon">▸</span><span>Merumuskan novelty dan kontribusi teoritis artikel jurnal</span></li>
+        <li><span class="check-icon">▸</span><span>Membandingkan dan mensintesis beberapa teori atau pendekatan</span></li>
+        <li><span class="check-icon">▸</span><span>Mengevaluasi kelemahan metodologi penelitian</span></li>
+        <li><span class="check-icon">▸</span><span>Membangun argumen untuk latar belakang masalah proposal hibah</span></li>
+        <li><span class="check-icon">▸</span><span>Merespons komentar reviewer dengan argumen yang kuat</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-dim">TIDAK PERLU</span>
+      <div class="card-title">Tugas sederhana dan administratif</div>
+    </div>
+    <div class="card-text">
+      <ul class="checklist" style="margin:6px 0 0">
+        <li><span class="check-icon">·</span><span>Menyusun email biasa atau undangan rapat</span></li>
+        <li><span class="check-icon">·</span><span>Memformat referensi ke APA style</span></li>
+        <li><span class="check-icon">·</span><span>Membuat jadwal atau timeline sederhana</span></li>
+        <li><span class="check-icon">·</span><span>Merangkum satu artikel yang sudah jelas isinya</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="sec-label" style="margin-bottom:8px">Cara mengaktifkan di Claude</div>
+
+  <div class="status-row">
+    <div class="status-dot dot-mid"></div>
+    <div class="status-label">Extended Thinking</div>
+    <div class="status-val">Klik ikon ⚡ atau toggle "Extended thinking" di toolbar chat</div>
+  </div>
+  <div class="status-row">
+    <div class="status-dot dot-mid"></div>
+    <div class="status-label">Model</div>
+    <div class="status-val">Gunakan Claude Opus 4.6 untuk Thinking — bukan Haiku atau Sonnet</div>
+  </div>
+
+  <div class="callout callout-green" style="margin-top:12px">
+    <strong>Ingat:</strong> Thinking membutuhkan waktu lebih lama. Ini normal dan disengaja. Jangan batalkan prosesnya — hasilnya akan jauh lebih dalam dibanding tanpa Thinking.
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="show('p1', document.querySelectorAll('.tab')[1])">← Projects</button>
+    <button class="btn btn-primary" onclick="show('p3', document.querySelectorAll('.tab')[3])">03 — Search →</button>
+  </div>
+</div>
+
+<!-- ══════════════ PANEL 3 ══ -->
+<div class="panel" id="panel-p3">
+  <div class="sec-label">Langkah 03 dari 03</div>
+  <div class="sec-title">Web Search</div>
+  <div class="sec-desc">Bukan hanya untuk data terbaru — Search adalah obat untuk halusinasi AI.</div>
+
+  <div class="pull-quote">
+    "Pre-training memberi AI ingatan tentang dunia seperti yang ada berbulan-bulan lalu. Search memberinya <em>mata</em>. Model dengan mata jauh lebih jarang berhalusinasi."
+  </div>
+
+  <div class="div"></div>
+
+  <div class="sec-label" style="margin-bottom:10px">Mengapa AI mengarang fakta</div>
+
+  <div class="steps">
+    <div class="step-row">
+      <div class="step-aside">
+        <div class="step-dot" style="font-size:8px">WHY</div>
+        <div class="step-vline"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">AI tidak "tahu" — AI mengenali pola</div>
+        <div class="step-text">AI dilatih dari miliaran teks di internet. Ia mempelajari <strong>pola bagaimana informasi yang benar disusun</strong> — bukan faktanya itu sendiri. Ketika tidak punya informasi yang cukup, AI tidak bilang "saya tidak tahu." Ia melengkapi polanya dengan apa yang <em>terdengar seperti jawaban yang benar</em>.</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-aside">
+        <div class="step-dot" style="font-size:8px">FIX</div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Search memaksa AI menyentuh kenyataan</div>
+        <div class="step-text">Dengan Search aktif, AI harus mencari dan <strong>mengutip sumber nyata</strong> — bukan menghasilkan yang terdengar benar. Ini membuat AI bertanggung jawab kepada fakta dengan cara yang tidak pernah bisa dilakukan oleh mode generasi murni.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="sec-label" style="margin-bottom:10px">Kapan aktifkan Search — panduan untuk dosen</div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-green">AKTIFKAN SEARCH</span>
+      <div class="card-title">Ketika akurasi dan verifikasi kritis</div>
+    </div>
+    <div class="card-text">
+      <ul class="checklist" style="margin:6px 0 0">
+        <li><span class="check-icon">▸</span><span>Mencari publikasi terbaru di bidang penelitianmu (Scopus, WoS)</span></li>
+        <li><span class="check-icon">▸</span><span>Mengecek regulasi atau panduan terbaru hibah Dikti/BRIN</span></li>
+        <li><span class="check-icon">▸</span><span>Memverifikasi data statistik atau angka yang akan dikutip</span></li>
+        <li><span class="check-icon">▸</span><span>Mencari penelitian terbaru untuk bagian tinjauan pustaka</span></li>
+        <li><span class="check-icon">▸</span><span>Mengecek apakah topik yang akan ditulis sudah ada yang meneliti</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-dim">TIDAK PERLU SEARCH</span>
+      <div class="card-title">Ketika menggunakan file yang kamu upload sendiri</div>
+    </div>
+    <div class="card-text">Jika kamu sudah upload dokumen, data penelitian, atau literatur yang relevan ke Project — minta AI hanya menggunakan file tersebut. Ketik: <em style="color:var(--text-mid)">"Hanya gunakan file yang saya upload sebagai sumber."</em> Ini mencegah AI mencampur sumber eksternalnya sendiri.</div>
+    <div class="callout callout-blue" style="margin-top:10px">
+      <strong>Strategi terbaik:</strong> Untuk riset literatur — aktifkan Search. Untuk menulis artikel berdasarkan datamu sendiri — matikan Search, gunakan file uploadmu.
+    </div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="sec-label" style="margin-bottom:8px">Status setup ideal sebelum prompt</div>
+
+  <div class="status-row">
+    <div class="status-dot dot-on"></div>
+    <div class="status-label">Project aktif</div>
+    <div class="status-val">Voice profile + instruksi sudah tersedia</div>
+  </div>
+  <div class="status-row">
+    <div class="status-dot dot-on"></div>
+    <div class="status-label">Extended Thinking</div>
+    <div class="status-val">ON — untuk tugas analisis dan penulisan mendalam</div>
+  </div>
+  <div class="status-row">
+    <div class="status-dot dot-mid"></div>
+    <div class="status-label">Web Search</div>
+    <div class="status-val">Situasional — ON jika butuh akurasi referensi</div>
+  </div>
+  <div class="status-row">
+    <div class="status-dot dot-on"></div>
+    <div class="status-label">Model</div>
+    <div class="status-val">Claude Opus 4.6</div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="show('p2', document.querySelectorAll('.tab')[2])">← Thinking</button>
+    <button class="btn btn-primary" onclick="show('p4', document.querySelectorAll('.tab')[4])">04 — Checklist Harian →</button>
+  </div>
+</div>
+
+<!-- ══════════════ PANEL 4 ══ -->
+<div class="panel" id="panel-p4">
+  <div class="sec-label">Checklist harian</div>
+  <div class="sec-title">Before You Prompt</div>
+  <div class="sec-desc">Gunakan checklist ini setiap kali membuka Claude untuk bekerja. Lamanya: kurang dari 60 detik.</div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dots"><span></span><span></span><span></span></div>
+      <div class="terminal-label">pre-prompt-checklist.md</div>
+      <button class="copy-btn" onclick="copyEl('cl1', this)">COPY</button>
+    </div>
+    <div class="terminal-body" id="cl1"><span class="ok">## BEFORE YOU PROMPT — Checklist Harian</span>
+
+<span class="kw">[ ] 1. MASUK KE PROJECT YANG TEPAT</span>
+     Jangan buka chat baru dari halaman utama.
+     Masuk ke Project "Penelitian" atau "Pengajaran" dulu.
+     Semua instruksi dan file sudah aktif di sana.
+
+<span class="kw">[ ] 2. PILIH MODEL YANG TEPAT</span>
+     Tugas berat (analisis, penulisan jurnal) → Opus 4.6
+     Tugas ringan (format, email, ringkasan)  → Sonnet
+
+<span class="kw">[ ] 3. AKTIFKAN EXTENDED THINKING</span>
+     Selalu ON untuk: analisis, novelty, argumen teoritis.
+     Bisa OFF untuk: tugas administratif sederhana.
+
+<span class="kw">[ ] 4. TENTUKAN PERLU SEARCH ATAU TIDAK</span>
+     ON  → jika butuh referensi terbaru atau verifikasi data
+     OFF → jika hanya menggunakan file yang sudah diupload
+
+<span class="kw">[ ] 5. BARU KETIK PROMPTMU</span>
+     Gunakan template: "Saya ingin [TUGAS] agar [SUKSES].
+     Baca [nama-file.md] terlebih dahulu. Jangan mulai
+     mengerjakan — ajukan pertanyaan klarifikasi dulu."</div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="sec-label" style="margin-bottom:10px">Template prompt pembuka yang sudah terbukti</div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dots"><span></span><span></span><span></span></div>
+      <div class="terminal-label">template — untuk jurnal</div>
+      <button class="copy-btn" onclick="copyEl('t1', this)">COPY</button>
+    </div>
+    <div class="terminal-body" id="t1">Saya ingin <span class="ph">[TUGAS SPESIFIK]</span>
+agar <span class="ph">[KRITERIA SUKSES YANG TERUKUR]</span>.
+
+Pertama, baca file-file ini sepenuhnya:
+1. voice-profile.md — cara berpikir dan standar tulisanku
+2. <span class="ph">[file-relevan.md]</span> — <span class="ph">[isinya]</span>
+
+<span class="cm">JANGAN mulai mengerjakan dulu.</span>
+Gunakan AskUserQuestion untuk bertanya hal yang perlu
+dikklarifikasi. Mulai bekerja hanya setelah kita sepakat.</div>
+  </div>
+
+  <div class="terminal" style="margin-top:8px">
+    <div class="terminal-bar">
+      <div class="terminal-dots"><span></span><span></span><span></span></div>
+      <div class="terminal-label">template — untuk pencarian referensi</div>
+      <button class="copy-btn" onclick="copyEl('t2', this)">COPY</button>
+    </div>
+    <div class="terminal-body" id="t2"><span class="cm">// Pastikan Search AKTIF sebelum mengirim prompt ini</span>
+
+Cari dan rangkum publikasi terbaru (2022-2026) tentang:
+<span class="ph">[TOPIK PENELITIAN]</span>
+
+Fokus pada:
+- Metode yang digunakan
+- Temuan utama
+- Research gap yang tersisa
+
+Format output: tabel sintesis dengan kolom:
+Penulis/Tahun | Topik | Metode | Temuan | Gap
+
+Gunakan hanya sumber yang terverifikasi (jurnal terindeks).
+Sertakan DOI atau URL untuk setiap sumber.</div>
+  </div>
+
+  <div class="div"></div>
+
+  <div class="sec-label" style="margin-bottom:10px">Ringkasan — 3 hal yang menempatkanmu di 1% teratas pengguna AI</div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-blue">01</span>
+      <div class="card-title">Projects — AI ingat siapa kamu</div>
+    </div>
+    <div class="card-text">Setup sekali: instruksi + file referensi. Tidak perlu memperkenalkan dirimu lagi setiap sesi. Tersedia di Claude, ChatGPT, dan Grok.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-green">02</span>
+      <div class="card-title">Extended Thinking — AI berpikir sebelum menjawab</div>
+    </div>
+    <div class="card-text">Mengubah kedalaman pemecahan masalah. Aktifkan untuk semua tugas yang butuh penalaran dan argumen ilmiah. Gunakan Opus 4.6.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="badge badge-amber">03</span>
+      <div class="card-title">Search — AI tidak mengarang fakta</div>
+    </div>
+    <div class="card-text">Memaksa AI mengutip sumber nyata, bukan mengisi celah dengan pola yang terdengar benar. Kritis untuk tulisan ilmiah dan data penelitian.</div>
+  </div>
+
+  <div class="callout callout-amber" style="margin-top:14px">
+    <strong>Ingat:</strong> Ketiga hal ini adalah yang harus dilakukan <em>sebelum</em> mengetik prompt. Bukan pengganti prompt yang baik — tapi fondasi yang memungkinkan prompt sederhana menghasilkan output yang luar biasa.
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="show('p0', document.querySelectorAll('.tab')[0])">← Mulai dari awal</button>
+    <button class="btn btn-ghost" onclick="show('p3', document.querySelectorAll('.tab')[3])">← Search</button>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyEl(id, btn) {
+  const el = document.getElementById(id);
+  const text = (el.innerText || el.textContent)
+    .replace(/\/\/ .+/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  doCopy(text, btn);
+}
+
+function doCopy(text, btn) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => flash(btn));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); flash(btn); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+}
+
+function flash(btn) {
+  const orig = btn.textContent;
+  btn.textContent = 'COPIED';
+  btn.classList.add('ok');
+  setTimeout(() => { btn.textContent = orig; btn.classList.remove('ok'); }, 2000);
+}
+</script>
+</body>
+</html>
